@@ -32,7 +32,6 @@ graph2 = get_sankey_graph(
     ""
 )
 st.plotly_chart(graph2)
-st.divider()
 
 # Migrated Candidates Table Data Preparation
 migrated_to_morena = get_migrated_to_morena(comparison_df_only_coalitions)
@@ -92,8 +91,6 @@ st.subheader(f'{len(comparison_by_parties_in_coalition)} candidatos no cambiaron
 st.dataframe(
     copy_df_for_display(comparison_by_parties_in_coalition).reset_index(drop=True)
 )
-
-st.divider()
 
 # Candidate count
 candidates_count_2018 = len(candidates2018_by_coalition)
