@@ -266,7 +266,6 @@ def get_sankey_graph(labels, source_indexes, target_indexes, values, title):
                     source=source_indexes,
                     target=target_indexes,
                     value=values,
-                    hovercolor=["yellow"] * len(labels),
                 )
             )
         ]
