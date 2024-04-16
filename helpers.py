@@ -27,8 +27,16 @@ COL_NAME_CANDIDATE = 'NOMBRE_CANDIDATO'
 COL_NAME_SORTED_CANDIDATE_NAME = 'NOMBRE_COMPLETO_ORDENADO'
 COL_NAME_SOURCE_PARTY_COALITION = 'PARTIDO_COALICION_x'
 COL_NAME_TARGET_PARTY_COALITION = 'PARTIDO_COALICION_y'
+COL_NAME_SOURCE_CANDIDATE_NAME = 'NOMBRE_CANDIDATO_x'
+COL_NAME_TARGET_CANDIDATE_NAME = 'NOMBRE_CANDIDATO_y'
+
+
 COL_DISPLAY_NAME_SOURCE_PARTY_COALITION = 'Partido o Coalición 2018'
 COL_DISPLAY_NAME_TARGET_PARTY_COALITION = 'Partido o Coalición 2024'
+
+
+def has_common_elements(set1, set2):
+    return len(set1.intersection(set2)) > 0
 
 
 def join_with_spaces(x):
@@ -273,7 +281,7 @@ def copy_df_for_display(df):
     dfc.drop(['NOMBRE_CANDIDATO_x', COL_NAME_SORTED_CANDIDATE_NAME], axis=1, inplace=True)
     dfc.rename(
         columns={
-            'NOMBRE_CANDIDATO_y': 'Candidato',
+            COL_NAME_TARGET_CANDIDATE_NAME: 'Candidato',
             COL_NAME_SOURCE_PARTY_COALITION: COL_DISPLAY_NAME_SOURCE_PARTY_COALITION,
             COL_NAME_TARGET_PARTY_COALITION: COL_DISPLAY_NAME_TARGET_PARTY_COALITION,
             'TIPO_CANDIDATURA_PROP': 'Cargo 2018',
@@ -285,7 +293,7 @@ def copy_df_for_display(df):
     )
     dfc = dfc[
         ['Candidato',
-         'Partido o Coalición 2018', 'Partido o Coalición 2024',
+         COL_DISPLAY_NAME_SOURCE_PARTY_COALITION, COL_DISPLAY_NAME_TARGET_PARTY_COALITION,
          'Cargo 2018', 'Cargo 2024',
          'Entidad 2018', 'Entidad 2024']
     ]
@@ -294,5 +302,41 @@ def copy_df_for_display(df):
     return dfc
 
 
-def has_common_elements(set1, set2):
-    return len(set1.intersection(set2)) > 0
+def get_migrated_to_morena(comparison_df):
+    display_df = copy_df_for_display(comparison_df)
+    migrated_to_morena = display_df[
+        (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION] != COAL_MORENA_2018_PARTIES)
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION] == COAL_MORENA_2024_PARTIES)
+        ].reset_index(drop=True, inplace=False)
+    migrated_to_morena.index += 1
+
+    return migrated_to_morena
+
+
+def get_migrated_to_mc(comparison_df):
+    display_df = copy_df_for_display(comparison_df)
+    migrated_to_mc = display_df[
+        (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION] != COAL_PAN_2018_PARTIES)
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION] == MC)
+        ].reset_index()
+    migrated_to_mc.index += 1
+
+    return migrated_to_mc
+
+
+def get_migrated_to_pan_pri(comparison_df):
+    display_df = copy_df_for_display(comparison_df)
+    migrated_to_pan_pri = display_df[
+        (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION].notna())
+        & (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION] != COAL_PRI_2018_PARTIES)
+        & (display_df[COL_DISPLAY_NAME_SOURCE_PARTY_COALITION] != COAL_PAN_2018_PARTIES)
+        & (display_df[COL_DISPLAY_NAME_TARGET_PARTY_COALITION] == COAL_PAN_PRI_2024_PARTIES)
+        ].reset_index()
+    migrated_to_pan_pri.index += 1
+
+    return migrated_to_pan_pri
